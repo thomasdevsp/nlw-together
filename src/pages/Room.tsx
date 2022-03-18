@@ -8,8 +8,9 @@ import { Button } from '../components/Button'
 import { RoomCode } from '../components/RoomCode'
 import { database } from '../services/firebase'
 
-import '../styles/room.scss'
+import { Question } from '../components/Question'
 
+import '../styles/room.scss'
 
 type FirebaseQuestions = Record<string, {
   author: {
@@ -21,7 +22,7 @@ type FirebaseQuestions = Record<string, {
   isHighlighted: boolean,
 }>
 
-type Questions = {
+type QuestionsType = {
   id: string;
   author: {
     name: string,
@@ -41,7 +42,7 @@ export function Room() {
   const { user } = useAuth();
   const params = useParams<RoomParams>();
   const [newQuestion, setNewQuestion] = useState('');
-  const [questions, setQuestions] = useState<Questions[]>([]);
+  const [questions, setQuestions] = useState<QuestionsType[]>([]);
   const [title, setTitle] = useState('');
 
   const roomId = params.id;
@@ -89,7 +90,7 @@ export function Room() {
       isAnswered: false,
     };
 
-    await database.ref(`room/${roomId}/questions`).push(question);
+    await database.ref(`rooms/${roomId}/questions`).push(question);
 
     setNewQuestion('');
   }
@@ -128,6 +129,18 @@ export function Room() {
             <Button type="submit" disabled={!user}>Enviar pergunta</Button>
           </div>
         </form>
+
+        <div className="question-list">
+          {questions.map(question => {
+            return (
+              <Question
+                key={question.id}
+                content={question.content}
+                author={question.author}
+              />
+            );
+          })}
+        </div>
       </main>
     </div >
   );
